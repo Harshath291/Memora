@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,32 +10,38 @@ import { toast } from "sonner";
 import { BookHeart } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
-const API = `${BACKEND_URL}/api`; 
+const API = `${BACKEND_URL}/api`;
 
-export default function LoginPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+export default function ResetPasswordPage() {
+  const [searchParams] = useSearchParams();
+  const tokenFromQuery = searchParams.get("token") || "";
+  const usernameFromQuery = searchParams.get("username") || "";
+
+  const [token, setToken] = useState(tokenFromQuery);
+  const [username, setUsername] = useState(usernameFromQuery);
+  const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  useEffect(() => {
+    // update state if query params change
+    setToken(tokenFromQuery);
+    setUsername(usernameFromQuery);
+  }, [tokenFromQuery, usernameFromQuery]);
+
+  const handleReset = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      const response = await axios.post(`${API}/auth/login`, {
+      await axios.post(`${API}/auth/reset-password`, {
         username,
-        password,
+        token,
+        new_password: newPassword,
       });
-
-      localStorage.setItem("memora_token", response.data.token);
-      localStorage.setItem("memora_username", response.data.username);
-      // store user id for messaging/ownership checks
-      localStorage.setItem("memora_user_id", response.data.user_id);
-      toast.success("Welcome back!");
-      navigate("/welcome");
-    } catch (error) {
-      toast.error(error.response?.data?.detail || "Login failed");
+      toast.success("Password updated successfully. You can now sign in.");
+      navigate("/login");
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "Failed to reset password");
     } finally {
       setLoading(false);
     }
@@ -66,57 +72,59 @@ export default function LoginPage() {
           <p className="text-muted-foreground">Write today. Remember tomorrow.</p>
         </div>
 
-        <Card data-testid="login-card" className="glass-card border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <Card className="glass-card border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
           <CardHeader>
-            <CardTitle className="text-2xl font-serif">Welcome back</CardTitle>
-            <CardDescription>Sign in to continue your journey</CardDescription>
+            <CardTitle className="text-2xl font-serif">Reset password</CardTitle>
+            <CardDescription>Set a new password for your account</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleReset} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="username">Username</Label>
                 <Input
                   id="username"
-                  data-testid="login-username-input"
+                  data-testid="reset-username-input"
                   type="text"
-                  placeholder="Enter your username"
+                  placeholder="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   className="rounded-xl h-12"
                 />
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="token">Token</Label>
                 <Input
-                  id="password"
-                  data-testid="login-password-input"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="token"
+                  data-testid="reset-token-input"
+                  type="text"
+                  placeholder="reset token"
+                  value={token}
+                  onChange={(e) => setToken(e.target.value)}
                   required
                   className="rounded-xl h-12"
                 />
               </div>
-              <Button
-                type="submit"
-                data-testid="login-submit-button"
-                className="w-full rounded-full h-12 font-bold btn-hover"
-                disabled={loading}
-              >
-                {loading ? "Signing in..." : "Sign In"}
+
+              <div className="space-y-2">
+                <Label htmlFor="new-password">New password</Label>
+                <Input
+                  id="new-password"
+                  data-testid="reset-newpassword-input"
+                  type="password"
+                  placeholder="Enter new password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  className="rounded-xl h-12"
+                />
+              </div>
+
+              <Button type="submit" data-testid="reset-submit" className="w-full rounded-full h-12 font-bold btn-hover" disabled={loading}>
+                {loading ? "Updating..." : "Update password"}
               </Button>
             </form>
-
-            <div className="mt-4 text-center">
-              <p className="text-sm text-muted-foreground">
-                Don't have an account?{" "}
-                <Link to="/signup" className="text-primary hover:underline font-semibold" data-testid="signup-link">
-                  Sign up
-                </Link>
-              </p>
-            </div>
           </CardContent>
         </Card>
       </motion.div>

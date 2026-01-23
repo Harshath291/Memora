@@ -29,6 +29,25 @@ function setupDevServer(config) {
     if (!devServer) throw new Error("webpack-dev-server not defined");
     devServer.app.use(express.json());
 
+    // Strip Emergent badge from HTML responses (development only)
+    devServer.app.use((req, res, next) => {
+      const originalSend = res.send;
+      res.send = function (body) {
+        try {
+          if (typeof body === 'string' && body.includes('Made with Emergent')) {
+            // Remove anchor with id emergent-badge
+            body = body.replace(/<a[^>]*id=["']emergent-badge["'][\s\S]*?<\/a>/gi, '');
+            // Remove any remaining occurrences of the text
+            body = body.replace(/Made with Emergent/gi, '');
+          }
+        } catch (e) {
+          // Ignore errors and send original body
+        }
+        return originalSend.call(this, body);
+      };
+      next();
+    });
+
     // CORS origin validation
     const isAllowedOrigin = (origin) => {
       if (!origin) return false;

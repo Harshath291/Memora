@@ -9,8 +9,8 @@ import axios from "axios";
 import { toast } from "sonner";
 import { BookHeart } from "lucide-react";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
+const API = `${BACKEND_URL}/api`; 
 
 export default function SignupPage() {
   const [username, setUsername] = useState("");
@@ -32,6 +32,8 @@ export default function SignupPage() {
 
       localStorage.setItem("memora_token", response.data.token);
       localStorage.setItem("memora_username", response.data.username);
+      // store user id for messaging/ownership checks
+      localStorage.setItem("memora_user_id", response.data.user_id);
       toast.success("Account created successfully!");
       navigate("/welcome");
     } catch (error) {

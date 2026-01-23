@@ -13,6 +13,8 @@ import OnThisDayPage from "@/pages/OnThisDayPage";
 import RemindersPage from "@/pages/RemindersPage";
 import FriendsPage from "@/pages/FriendsPage";
 import CheckboxNotesPage from "@/pages/CheckboxNotesPage";
+import FriendProfilePage from "@/pages/FriendProfilePage";
+
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("memora_token");
@@ -51,6 +53,7 @@ function App() {
             <Route path="on-this-day" element={<OnThisDayPage />} />
             <Route path="reminders" element={<RemindersPage />} />
             <Route path="friends" element={<FriendsPage />} />
+            <Route path="friend/:username" element={<FriendProfilePage />} />
             <Route path="checkbox-notes" element={<CheckboxNotesPage />} />
           </Route>
           <Route path="/" element={<Navigate to="/login" replace />} />
