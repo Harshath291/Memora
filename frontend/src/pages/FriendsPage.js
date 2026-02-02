@@ -11,7 +11,7 @@ import { Users, Plus, UserPlus } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export default function FriendsPage() {
