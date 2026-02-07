@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "../components/ui/card";
 import axios from "axios";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { FileText, Calendar, Edit, Trash } from "lucide-react";
 import { format } from "date-fns";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Textarea } from "../components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,7 @@ import {
   DialogFooter,
   DialogDescription,
   DialogClose,
-} from "@/components/ui/dialog";
+} from "../components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -27,7 +27,8 @@ import {
   AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
+} from "../components/ui/alert-dialog";
+
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;

@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from "react";
-import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Toaster } from "@/components/ui/sonner";
-import LoginPage from "@/pages/LoginPage";
-import SignupPage from "@/pages/SignupPage";
-import WelcomePage from "@/pages/WelcomePage";
-import DashboardLayout from "@/components/DashboardLayout";
-import NewNotePage from "@/pages/NewNotePage";
-import PastNotesPage from "@/pages/PastNotesPage";
-import NoteDetailPage from "@/pages/NoteDetailPage";
-import OnThisDayPage from "@/pages/OnThisDayPage";
-import RemindersPage from "@/pages/RemindersPage";
-import FriendsPage from "@/pages/FriendsPage";
-import CheckboxNotesPage from "@/pages/CheckboxNotesPage";
-import FriendProfilePage from "@/pages/FriendProfilePage";
+import { Toaster } from "./components/ui/sonner";
+
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import WelcomePage from "./pages/WelcomePage";
+
+import DashboardLayout from "./components/DashboardLayout";
+
+import NewNotePage from "./pages/NewNotePage";
+import PastNotesPage from "./pages/PastNotesPage";
+import NoteDetailPage from "./pages/NoteDetailPage";
+import OnThisDayPage from "./pages/OnThisDayPage";
+import RemindersPage from "./pages/RemindersPage";
+import FriendsPage from "./pages/FriendsPage";
+import CheckboxNotesPage from "./pages/CheckboxNotesPage";
+import FriendProfilePage from "./pages/FriendProfilePage";
+
 
 
 const ProtectedRoute = ({ children }) => {

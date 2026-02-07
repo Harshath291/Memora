@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Avatar, AvatarFallback } from "../components/ui/avatar";
+
 import axios from "axios";
 import { toast } from "sonner";
 import { Users, Plus, UserPlus } from "lucide-react";

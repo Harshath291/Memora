@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "../components/ui/button";
+
 import axios from "axios";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
