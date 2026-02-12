@@ -56,7 +56,7 @@ export default function FriendProfilePage() {
       });
       setProfile(res.data);
       setProfileNotFound(false);
-      return true;
+      return res.data;
     } catch (e) {
       const msg = e.response?.data?.detail || "Failed to fetch user";
       toast.error(msg);
@@ -64,17 +64,18 @@ export default function FriendProfilePage() {
         setProfile(null);
         setProfileNotFound(true);
       }
-      return false;
+      return null;
     }
   }, [username]);
 
-  const fetchMessages = useCallback(async () => {
+  const fetchMessages = useCallback(async (userId) => {
     try {
       const token = localStorage.getItem("memora_token");
       const res = await axios.get(`${API}/messages/${username}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessages(res.data);
+
       setTimeout(
         () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }),
         50
@@ -89,11 +90,11 @@ export default function FriendProfilePage() {
         localStorage.setItem("memora_unread_updated", String(Date.now()));
       } catch {}
 
-      if (wsRef.current && profile?.user_id) {
+      if (wsRef.current && userId) {
         wsRef.current.send(
           JSON.stringify({
             event: "mark_read",
-            friend_user_id: profile.user_id,
+            friend_user_id: userId,
           })
         );
       }
@@ -102,16 +103,17 @@ export default function FriendProfilePage() {
         toast.error(e.response?.data?.detail || "Failed to fetch messages");
       }
     }
-  }, [username, profile?.user_id]);
+  }, [username]);
 
   useEffect(() => {
     let mounted = true;
 
     const start = async () => {
-      const found = await fetchProfile();
-      if (!found || tab !== "messages") return;
+      const profileData = await fetchProfile();
+      if (!profileData || tab !== "messages") return;
 
-      await fetchMessages();
+      const userId = profileData.user_id;
+      await fetchMessages(userId);
 
       try {
         const token = localStorage.getItem("memora_token");
@@ -123,14 +125,12 @@ export default function FriendProfilePage() {
         wsRef.current = ws;
 
         ws.onopen = () => {
-          if (profile?.user_id) {
-            ws.send(
-              JSON.stringify({
-                event: "mark_read",
-                friend_user_id: profile.user_id,
-              })
-            );
-          }
+          ws.send(
+            JSON.stringify({
+              event: "mark_read",
+              friend_user_id: userId,
+            })
+          );
         };
 
         ws.onmessage = (ev) => {
@@ -163,7 +163,7 @@ export default function FriendProfilePage() {
         wsRef.current?.close();
       } catch {}
     };
-  }, [fetchProfile, fetchMessages, tab, profile?.user_id]);
+  }, [fetchProfile, fetchMessages, tab]);
 
   const sendMessage = async (e) => {
     e.preventDefault();

@@ -40,12 +40,13 @@ export default function RemindersPage() {
   const timersRef = useRef({});
   const acknowledgedRef = useRef(new Set());
   const alarmIntervalRef = useRef(null);
+  const activeAlarmRef = useRef(null);
   const [activeAlarm, setActiveAlarm] = useState(null);
 
-  const clearTimers = () => {
+  const clearTimers = useCallback(() => {
     Object.values(timersRef.current).forEach(clearTimeout);
     timersRef.current = {};
-  };
+  }, []);
 
   const playBeepOnce = () => {
     try {
@@ -70,24 +71,27 @@ export default function RemindersPage() {
     } catch {}
   };
 
-  const startAlarm = (rem) => {
+  const startAlarm = useCallback((rem) => {
+    activeAlarmRef.current = rem;
     setActiveAlarm(rem);
     playBeepOnce();
+
     if (alarmIntervalRef.current) clearInterval(alarmIntervalRef.current);
     alarmIntervalRef.current = setInterval(playBeepOnce, 2000);
-  };
+  }, []);
 
-  const stopAlarm = () => {
+  const stopAlarm = useCallback(() => {
     if (alarmIntervalRef.current) {
       clearInterval(alarmIntervalRef.current);
       alarmIntervalRef.current = null;
     }
+    activeAlarmRef.current = null;
     setActiveAlarm(null);
-  };
+  }, []);
 
-  const triggerReminder = (rem) => {
+  const triggerReminder = useCallback((rem) => {
     if (acknowledgedRef.current.has(rem.id)) return;
-    if (activeAlarm?.id === rem.id) return;
+    if (activeAlarmRef.current?.id === rem.id) return;
 
     if (window.Notification && Notification.permission === "granted") {
       try {
@@ -99,31 +103,29 @@ export default function RemindersPage() {
 
     startAlarm(rem);
     toast.success(rem.title || "Reminder");
-  };
+  }, [startAlarm]);
 
-  const scheduleAllReminders = useCallback(
-    (list) => {
-      clearTimers();
-      const now = Date.now();
+  const scheduleAllReminders = useCallback((list) => {
+    clearTimers();
+    const now = Date.now();
 
-      list.forEach((rem) => {
-        if (!rem.date) return;
-        const runAt = new Date(rem.date).getTime();
-        const ms = runAt - now;
+    list.forEach((rem) => {
+      if (!rem.date) return;
 
-        if (ms <= 0) {
-          if (ms > -60000) triggerReminder(rem);
-          return;
-        }
+      const runAt = new Date(rem.date).getTime();
+      const ms = runAt - now;
 
-        timersRef.current[rem.id] = setTimeout(
-          () => triggerReminder(rem),
-          ms
-        );
-      });
-    },
-    [activeAlarm]
-  );
+      if (ms <= 0) {
+        if (ms > -60000) triggerReminder(rem);
+        return;
+      }
+
+      timersRef.current[rem.id] = setTimeout(
+        () => triggerReminder(rem),
+        ms
+      );
+    });
+  }, [clearTimers, triggerReminder]);
 
   const fetchReminders = useCallback(async () => {
     try {
@@ -149,8 +151,9 @@ export default function RemindersPage() {
     return () => {
       clearInterval(interval);
       clearTimers();
+      stopAlarm();
     };
-  }, [fetchReminders]);
+  }, [fetchReminders, clearTimers, stopAlarm]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

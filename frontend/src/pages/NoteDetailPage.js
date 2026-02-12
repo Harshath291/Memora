@@ -40,10 +40,12 @@ const API = `${BACKEND_URL}/api`;
 export default function NoteDetailPage() {
   const [note, setNote] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const { noteId } = useParams();
   const navigate = useNavigate();
 
   const fetchNote = useCallback(async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem("memora_token");
       const response = await axios.get(`${API}/notes/${noteId}`, {
@@ -52,15 +54,21 @@ export default function NoteDetailPage() {
       setNote(response.data);
     } catch (error) {
       toast.error("Failed to fetch note");
-      navigate("/dashboard/past-notes");
+      setNote(null);
     } finally {
       setLoading(false);
     }
-  }, [noteId, navigate]);
+  }, [noteId]);
 
   useEffect(() => {
     fetchNote();
   }, [fetchNote]);
+
+  useEffect(() => {
+    if (!loading && !note) {
+      navigate("/dashboard/past-notes");
+    }
+  }, [loading, note, navigate]);
 
   if (loading) {
     return (
