@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 
-import { Button } from "../components/ui/button";
+import { Button } from "./button"
+
 import {
   Card,
   CardContent,
